@@ -1,0 +1,28 @@
+name: Sync Airtable -> Netlify
+
+# Periodically triggers a Netlify rebuild so new/updated property listings
+# and photos added in Airtable go live automatically, without anyone having
+# to click "Trigger deploy" in Netlify. Runs entirely on GitHub's own
+# servers (not Claude's), so it keeps working even when Claude isn't around.
+#
+# Requires a repository secret named NETLIFY_BUILD_HOOK (Settings ->
+# Secrets and variables -> Actions -> New repository secret) set to this
+# site's Netlify build hook URL. Never hardcode that URL here directly:
+# this repository is public, and anyone with the URL could spam rebuilds.
+#
+# Note: GitHub automatically disables scheduled workflows after 60 days
+# with no commits to the repo. If the automatic sync ever seems to stop,
+# a push to main (or manually re-enabling the workflow under the Actions
+# tab) starts it again.
+
+on:
+  schedule:
+    - cron: "0 */3 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  trigger-netlify-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Netlify build
+        run: curl -sf -X POST "${{ secrets.NETLIFY_BUILD_HOOK }}"
