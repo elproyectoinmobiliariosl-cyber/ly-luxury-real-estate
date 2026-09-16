@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --noir: #15130f;
+  --noir-soft: #241f17;
+  --ivory: #faf7f0;
+  --ivory-dim: #f2ecdd;
+  --sable: #ddceac;
+  --champagne: #efe4c9;
+  --brass: #a67c3d;
+  --brass-soft: #c7a361;
+  --ink: #241f17;
+  --ink-soft: #6d6553;
+  --line: rgba(36, 31, 23, 0.14);
+}
+
+@theme inline {
+  --color-noir: var(--noir);
+  --color-noir-soft: var(--noir-soft);
+  --color-ivory: var(--ivory);
+  --color-ivory-dim: var(--ivory-dim);
+  --color-sable: var(--sable);
+  --color-champagne: var(--champagne);
+  --color-brass: var(--brass);
+  --color-brass-soft: var(--brass-soft);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--brass);
+}
+
+/* Placeholder imagery until real property photography is supplied.
+   Swap any element carrying this class for a real <Image> once assets exist. */
+.photo-placeholder {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(198, 163, 97, 0.35), transparent 55%),
+    linear-gradient(135deg, #1f1c16 0%, #302a1f 50%, #17140f 100%);
+  /* No `position` here on purpose: this plain (unlayered) rule would always
+     win over Tailwind's `.relative`/`.absolute` utilities, which live inside
+     a CSS cascade layer and lose to any unlayered rule regardless of source
+     order or specificity. Positioning is applied per-usage instead, via the
+     Tailwind `relative` or `absolute` class alongside `photo-placeholder`. */
+}
+.photo-placeholder::after {
+  content: attr(data-label);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(250, 247, 240, 0.55);
+  border: 1px solid rgba(250, 247, 240, 0.18);
+  margin: 10px;
+}
