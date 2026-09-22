@@ -15,6 +15,19 @@ import {
 } from "@/lib/geography";
 import { notFound } from "next/navigation";
 import { buildAlternates } from "@/lib/seo";
+import { propertiesForPlace } from "@/lib/properties";
+
+function formatPrice(price: number, currency: string, locale: Locale) {
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: currency || "EUR",
+      maximumFractionDigits: 0,
+    }).format(price);
+  } catch {
+    return `${price.toLocaleString(locale)} ${currency}`;
+  }
+}
 
 export function generateStaticParams() {
   const params: { country: string; path: string[] }[] = [];
@@ -215,27 +228,50 @@ export default async function DestinationCatchAllPage({
   }
   if (!place) notFound();
 
+  const placeProperties = propertiesForPlace(place.slug);
+
   return (
     <>
       <Hero image={place.image ?? region.image ?? country.image} kicker={breadcrumb} title={place.name} />
       <section className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
         <p className="eyebrow">{dict.featured.kicker}</p>
         <h2 className="mt-2 text-3xl lg:text-4xl">{dict.featured.title}</h2>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="group">
-              <div className="relative aspect-[4/5] photo-placeholder" data-label={`${place.name} ${i}`} />
-              <div className="mt-4 flex items-baseline justify-between">
-                <div>
-                  <div className="text-sm text-ink-soft">{place.name}</div>
-                  <div className="font-display text-lg">Property Name</div>
-                </div>
-                <div className="text-sm text-brass">— €</div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <p className="mt-6 text-sm text-ink-soft">{dict.featured.empty}</p>
+        {placeProperties.length > 0 ? (
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {placeProperties.map((p) => {
+              const title = p.titles[l] ?? p.titles.en ?? p.reference;
+              const photo = p.photos[0];
+              return (
+                <Link key={p.id} href={`/${l}/properties/${p.slug}`} className="group block">
+                  <div className="relative aspect-[4/5] overflow-hidden">
+                    {photo ? (
+                      <Image
+                        src={photo}
+                        alt={title}
+                        fill
+                        sizes="(min-width: 1024px) 33vw, 50vw"
+                        className="object-cover transition duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="photo-placeholder h-full w-full" data-label={title} />
+                    )}
+                  </div>
+                  <div className="mt-4 flex items-baseline justify-between gap-3">
+                    <div>
+                      <div className="text-sm text-ink-soft">{place.name}</div>
+                      <div className="font-display text-lg">{title}</div>
+                    </div>
+                    <div className="shrink-0 text-sm text-brass">
+                      {p.price !== null ? formatPrice(p.price, p.currency, l) : dict.property.priceOnRequest}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="mt-6 text-sm text-ink-soft">{dict.featured.empty}</p>
+        )}
 
         <div className="mt-12">
           <Link

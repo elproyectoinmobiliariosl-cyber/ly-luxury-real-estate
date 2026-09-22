@@ -4,9 +4,22 @@ import Link from "next/link";
 import { isLocale, Locale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/dictionaries";
 import { notFound } from "next/navigation";
-import { distinctCategories, distinctCountries, liveProperties } from "@/lib/properties";
+import { distinctCategories, distinctCountries, liveProperties, countryLabelFor } from "@/lib/properties";
+import { getDevelopments, developmentFromPrice, developmentAvailability } from "@/lib/developments";
 import HeroSearch from "@/components/HeroSearch";
 import { buildAlternates } from "@/lib/seo";
+
+function formatPrice(price: number, currency: string, locale: Locale) {
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: currency || "EUR",
+      maximumFractionDigits: 0,
+    }).format(price);
+  } catch {
+    return `${price.toLocaleString(locale)} ${currency}`;
+  }
+}
 
 const DESTINATION_TEASER_IMAGES: Record<string, string> = {
   spain: "/images/villa-spain-interior.jpg",
@@ -40,6 +53,13 @@ export default async function HomePage({
   if (!isLocale(locale)) notFound();
   const l = locale as Locale;
   const dict = getDictionary(l);
+
+  // Homepage highlights: most recently published listings first (falls back
+  // to array order for older records with no Date_Publication on file).
+  const featuredProperties = [...liveProperties]
+    .sort((a, b) => (b.datePublication ?? "").localeCompare(a.datePublication ?? ""))
+    .slice(0, 3);
+  const featuredDevelopments = getDevelopments().slice(0, 2);
 
   return (
     <>
@@ -91,21 +111,43 @@ export default async function HomePage({
       <section className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
         <p className="eyebrow">{dict.featured.kicker}</p>
         <h2 className="mt-2 text-3xl lg:text-4xl">{dict.featured.title}</h2>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="group">
-              <div className="relative aspect-[4/5] photo-placeholder" data-label={`Property ${i}`} />
-              <div className="mt-4 flex items-baseline justify-between">
-                <div>
-                  <div className="text-sm text-ink-soft">Destination · Area</div>
-                  <div className="font-display text-lg">Property Name</div>
-                </div>
-                <div className="text-sm text-brass">— €</div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <p className="mt-6 text-sm text-ink-soft">{dict.featured.empty}</p>
+        {featuredProperties.length > 0 ? (
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredProperties.map((p) => {
+              const title = p.titles[l] ?? p.titles.en ?? p.reference;
+              const photo = p.photos[0];
+              const destination = [p.city, countryLabelFor(p.country, l, dict)].filter(Boolean).join(" · ");
+              return (
+                <Link key={p.id} href={`/${l}/properties/${p.slug}`} className="group block">
+                  <div className="relative aspect-[4/5] overflow-hidden">
+                    {photo ? (
+                      <Image
+                        src={photo}
+                        alt={title}
+                        fill
+                        sizes="(min-width: 1024px) 33vw, 50vw"
+                        className="object-cover transition duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="photo-placeholder h-full w-full" data-label={title} />
+                    )}
+                  </div>
+                  <div className="mt-4 flex items-baseline justify-between gap-3">
+                    <div>
+                      <div className="text-sm text-ink-soft">{destination || dict.destinations.kicker}</div>
+                      <div className="font-display text-lg">{title}</div>
+                    </div>
+                    <div className="shrink-0 text-sm text-brass">
+                      {p.price !== null ? formatPrice(p.price, p.currency, l) : dict.property.priceOnRequest}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="mt-6 text-sm text-ink-soft">{dict.featured.empty}</p>
+        )}
       </section>
 
       {/* EXCLUSIVE DEVELOPMENTS */}
@@ -113,32 +155,59 @@ export default async function HomePage({
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <p className="eyebrow">{dict.developments.kicker}</p>
           <h2 className="mt-2 text-3xl lg:text-4xl">{dict.developments.title}</h2>
-          <div className="mt-10 grid gap-8 lg:grid-cols-2">
-            {[1, 2].map((i) => (
-              <div key={i} className="flex flex-col overflow-hidden bg-white">
-                <div className="relative aspect-[16/10] photo-placeholder" data-label={`Development ${i}`} />
-                <div className="flex flex-1 flex-col justify-between p-6">
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs uppercase tracking-[0.1em] text-ink-soft">Destination</span>
-                      <span className="border border-brass/40 px-2 py-1 text-[0.65rem] uppercase tracking-[0.1em] text-brass">
-                        {dict.developments.status.comingSoon}
-                      </span>
+          {featuredDevelopments.length > 0 ? (
+            <div className="mt-10 grid gap-8 lg:grid-cols-2">
+              {featuredDevelopments.map((dev) => {
+                const from = developmentFromPrice(dev);
+                const availability = developmentAvailability(dev);
+                const destination = [dev.city, countryLabelFor(dev.country, l, dict)].filter(Boolean).join(", ");
+                const cover = dev.photos[0];
+                return (
+                  <Link
+                    key={dev.slug}
+                    href={`/${l}/developments/${dev.slug}`}
+                    className="group flex flex-col overflow-hidden bg-white"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      {cover ? (
+                        <Image
+                          src={cover}
+                          alt={dev.name}
+                          fill
+                          sizes="(min-width: 1024px) 50vw, 100vw"
+                          className="object-cover transition duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="photo-placeholder h-full w-full" data-label={dev.name} />
+                      )}
                     </div>
-                    <div className="mt-2 font-display text-xl">Development Name</div>
-                  </div>
-                  <div className="mt-6 flex items-center justify-between text-sm">
-                    <span className="text-ink-soft">From — </span>
-                    <Link href={`/${l}/developments`} className="text-brass hover:text-brass-soft">
-                      {dict.hero.ctaPrimary} →
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <p className="mt-6 text-sm text-ink-soft">{dict.developments.empty}</p>
-          <p className="mt-1 text-xs text-ink-soft/70">{dict.developments.disclaimer}</p>
+                    <div className="flex flex-1 flex-col justify-between p-6">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs uppercase tracking-[0.1em] text-ink-soft">
+                            {destination || dict.destinations.kicker}
+                          </span>
+                          <span className="border border-brass/40 px-2 py-1 text-[0.65rem] uppercase tracking-[0.1em] text-brass">
+                            {dict.developments.status[availability]}
+                          </span>
+                        </div>
+                        <div className="mt-2 font-display text-xl">{dev.name}</div>
+                      </div>
+                      <div className="mt-6 flex items-center justify-between text-sm">
+                        <span className="text-ink-soft">
+                          {from ? `${dict.property.priceFrom} ${formatPrice(from.price, from.currency, l)}` : dict.property.priceOnRequest}
+                        </span>
+                        <span className="text-brass group-hover:text-brass-soft">{dict.hero.ctaPrimary} →</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="mt-6 text-sm text-ink-soft">{dict.developments.empty}</p>
+          )}
+          <p className="mt-6 text-xs text-ink-soft/70">{dict.developments.disclaimer}</p>
         </div>
       </section>
 

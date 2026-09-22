@@ -36,6 +36,9 @@ export interface PropertyRecord {
   sector: string;
   city: string;
   zone: string;
+  projectName?: string; // Airtable "Nom_Projet" — shared across units of the same development (e.g. "Suku Residences"). Empty for a standalone, non-programme listing.
+  promoter?: string; // Airtable "Promoteur"
+  datePublication?: string;
   photos: string[];
   titles: Partial<Record<Locale, string>>;
   descriptions: Partial<Record<Locale, string>>;
@@ -169,6 +172,46 @@ const EUR_RATE_INDICATIVE: Record<string, number> = {
 
 export function priceInEURIndicative(price: number, currency: string): number {
   return price * (EUR_RATE_INDICATIVE[currency] ?? 1);
+}
+
+// Maps the raw Airtable "Ville" / "Secteur" labels to the matching slug in
+// lib/geography.ts, so a destination page (region or city) can list the
+// real properties located there. Bali properties store their neighbourhood
+// (Uluwatu, Canggu…) in both Ville and Secteur — geography.ts treats those
+// as top-level "regions" with no cities underneath, same as Dubai/Abu Dhabi.
+// Spain properties (once any exist) use Secteur for the Costa
+// Blanca/Cálida region and Ville for the actual town.
+const placeSlugByLabel: Record<string, string> = {
+  "Dubaï": "dubai",
+  "Abu Dhabi": "abu-dhabi",
+  Uluwatu: "uluwatu",
+  Canggu: "canggu",
+  Ubud: "ubud",
+  Seminyak: "seminyak",
+  "Costa Blanca": "costa-blanca",
+  "Costa Cálida": "costa-calida",
+  Torrevieja: "torrevieja",
+  "Orihuela Costa": "orihuela-costa",
+  "Guardamar del Segura": "guardamar-del-segura",
+  Algorfa: "algorfa",
+  Alicante: "alicante",
+  "San Javier": "san-javier",
+  "La Manga del Mar Menor": "la-manga-del-mar-menor",
+  "Los Alcázares": "los-alcazares",
+  Murcia: "murcia",
+};
+
+export function placeSlugFor(rawLabel: string): string | undefined {
+  return placeSlugByLabel[rawLabel];
+}
+
+// Every live property located at a given destinations.ts place (region or
+// city), matched on whichever of Ville/Secteur carries that place's name —
+// see placeSlugByLabel above for why both are checked.
+export function propertiesForPlace(placeSlug: string): PropertyRecord[] {
+  return liveProperties.filter(
+    (p) => placeSlugFor(p.city) === placeSlug || placeSlugFor(p.sector) === placeSlug
+  );
 }
 
 export function distinctCountries(props: PropertyRecord[]): string[] {

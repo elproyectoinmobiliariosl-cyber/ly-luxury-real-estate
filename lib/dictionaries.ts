@@ -45,6 +45,7 @@ export interface Dictionary {
       soldOut: string;
     };
     disclaimer: string;
+    configurations: string;
   };
   destinations: {
     kicker: string;
@@ -93,6 +94,7 @@ export interface Dictionary {
     surface: string;
     land: string;
     priceOnRequest: string;
+    priceFrom: string;
     priceNote: string;
     status: { available: string; sold: string; rented: string; reserved: string };
     requestInfo: string;
@@ -187,6 +189,7 @@ const en: Dictionary = {
       soldOut: "Sold Out",
     },
     disclaimer: "Prices and availability subject to change.",
+    configurations: "Available configurations",
   },
   destinations: {
     kicker: "Where We Operate",
@@ -256,6 +259,7 @@ const en: Dictionary = {
     surface: "Living area",
     land: "Plot size",
     priceOnRequest: "Price on request",
+    priceFrom: "From",
     priceNote: "Price shown in the property's original currency. Converted amounts are indicative only.",
     status: { available: "Available", sold: "Sold", rented: "Rented", reserved: "Reserved" },
     requestInfo: "Request more information",
@@ -350,6 +354,7 @@ const fr: Dictionary = {
       soldOut: "Vendu",
     },
     disclaimer: "Prix et disponibilité sous réserve de confirmation.",
+    configurations: "Configurations disponibles",
   },
   destinations: {
     kicker: "Nos destinations",
@@ -419,6 +424,7 @@ const fr: Dictionary = {
     surface: "Surface habitable",
     land: "Terrain",
     priceOnRequest: "Prix sur demande",
+    priceFrom: "À partir de",
     priceNote: "Prix affiché dans la devise d'origine du bien. Les montants convertis sont indicatifs.",
     status: { available: "Disponible", sold: "Vendu", rented: "Loué", reserved: "Réservé" },
     requestInfo: "Demander plus d'informations",
@@ -513,6 +519,7 @@ const es: Dictionary = {
       soldOut: "Vendido",
     },
     disclaimer: "Precios y disponibilidad sujetos a confirmación.",
+    configurations: "Configuraciones disponibles",
   },
   destinations: {
     kicker: "Dónde operamos",
@@ -582,6 +589,7 @@ const es: Dictionary = {
     surface: "Superficie habitable",
     land: "Parcela",
     priceOnRequest: "Precio a consultar",
+    priceFrom: "Desde",
     priceNote: "Precio mostrado en la divisa original del inmueble. Los importes convertidos son solo indicativos.",
     status: { available: "Disponible", sold: "Vendido", rented: "Alquilado", reserved: "Reservado" },
     requestInfo: "Solicitar más información",
@@ -676,6 +684,7 @@ const nl: Dictionary = {
       soldOut: "Uitverkocht",
     },
     disclaimer: "Prijzen en beschikbaarheid onder voorbehoud van bevestiging.",
+    configurations: "Beschikbare configuraties",
   },
   destinations: {
     kicker: "Waar wij actief zijn",
@@ -745,6 +754,7 @@ const nl: Dictionary = {
     surface: "Woonoppervlakte",
     land: "Perceeloppervlakte",
     priceOnRequest: "Prijs op aanvraag",
+    priceFrom: "Vanaf",
     priceNote: "Prijs weergegeven in de oorspronkelijke valuta van het pand. Omgerekende bedragen zijn indicatief.",
     status: { available: "Beschikbaar", sold: "Verkocht", rented: "Verhuurd", reserved: "Gereserveerd" },
     requestInfo: "Meer informatie aanvragen",
@@ -839,6 +849,7 @@ const de: Dictionary = {
       soldOut: "Verkauft",
     },
     disclaimer: "Preise und Verfügbarkeit vorbehaltlich Bestätigung.",
+    configurations: "Verfügbare Ausführungen",
   },
   destinations: {
     kicker: "Unsere Standorte",
@@ -908,6 +919,7 @@ const de: Dictionary = {
     surface: "Wohnfläche",
     land: "Grundstücksgröße",
     priceOnRequest: "Preis auf Anfrage",
+    priceFrom: "Ab",
     priceNote: "Preis in der Originalwährung der Immobilie angezeigt. Umgerechnete Beträge sind unverbindlich.",
     status: { available: "Verfügbar", sold: "Verkauft", rented: "Vermietet", reserved: "Reserviert" },
     requestInfo: "Weitere Informationen anfordern",
@@ -1002,6 +1014,7 @@ const sr: Dictionary = {
       soldOut: "Prodato",
     },
     disclaimer: "Cene i dostupnost podležu potvrdi.",
+    configurations: "Dostupne konfiguracije",
   },
   destinations: {
     kicker: "Gde poslujemo",
@@ -1071,6 +1084,7 @@ const sr: Dictionary = {
     surface: "Stambena površina",
     land: "Površina parcele",
     priceOnRequest: "Cena na upit",
+    priceFrom: "Od",
     priceNote: "Cena je prikazana u originalnoj valuti nekretnine. Preračunati iznosi su informativni.",
     status: { available: "Dostupno", sold: "Prodato", rented: "Izdato", reserved: "Rezervisano" },
     requestInfo: "Zatražite više informacija",
@@ -1165,6 +1179,7 @@ const hr: Dictionary = {
       soldOut: "Prodano",
     },
     disclaimer: "Cijene i dostupnost podliježu potvrdi.",
+    configurations: "Dostupne konfiguracije",
   },
   destinations: {
     kicker: "Gdje poslujemo",
@@ -1234,6 +1249,7 @@ const hr: Dictionary = {
     surface: "Stambena površina",
     land: "Površina parcele",
     priceOnRequest: "Cijena na upit",
+    priceFrom: "Od",
     priceNote: "Cijena je prikazana u izvornoj valuti nekretnine. Preračunati iznosi su informativni.",
     status: { available: "Dostupno", sold: "Prodano", rented: "Iznajmljeno", reserved: "Rezervirano" },
     requestInfo: "Zatražite više informacija",
@@ -1328,6 +1344,7 @@ const ru: Dictionary = {
       soldOut: "Продано",
     },
     disclaimer: "Цены и наличие подлежат подтверждению.",
+    configurations: "Доступные конфигурации",
   },
   destinations: {
     kicker: "Где мы работаем",
@@ -1397,6 +1414,7 @@ const ru: Dictionary = {
     surface: "Жилая площадь",
     land: "Площадь участка",
     priceOnRequest: "Цена по запросу",
+    priceFrom: "От",
     priceNote: "Цена указана в исходной валюте объекта. Пересчитанные суммы носят ориентировочный характер.",
     status: { available: "Доступно", sold: "Продано", rented: "Сдано", reserved: "Забронировано" },
     requestInfo: "Запросить дополнительную информацию",
@@ -1491,6 +1509,7 @@ const bg: Dictionary = {
       soldOut: "Продаден",
     },
     disclaimer: "Цените и наличността подлежат на потвърждение.",
+    configurations: "Налични конфигурации",
   },
   destinations: {
     kicker: "Къде работим",
@@ -1560,6 +1579,7 @@ const bg: Dictionary = {
     surface: "Жилищна площ",
     land: "Площ на парцела",
     priceOnRequest: "Цена при запитване",
+    priceFrom: "От",
     priceNote: "Преизчислените суми са ориентировъчни. Цената е показана в оригиналната валута на имота.",
     status: { available: "Налично", sold: "Продадено", rented: "Отдадено под наем", reserved: "Резервирано" },
     requestInfo: "Заявете повече информация",

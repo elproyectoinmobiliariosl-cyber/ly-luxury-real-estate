@@ -72,6 +72,10 @@ export const geography: GeoCountry[] = [
       {
         slug: "abu-dhabi",
         name: "Abu Dhabi",
+        // No dedicated Abu Dhabi photography yet even though a real listing
+        // (River Cove Residences) is published there — its own photos live
+        // only in Airtable's temporary attachment URLs, out of reach of this
+        // build. Swap in a real one once downloaded/committed.
       },
     ],
   },
@@ -81,10 +85,10 @@ export const geography: GeoCountry[] = [
     live: true,
     image: "/images/hero-bali.jpg",
     regions: [
-      { slug: "seminyak", name: "Seminyak" },
-      { slug: "ubud", name: "Ubud" },
-      { slug: "canggu", name: "Canggu" },
-      { slug: "uluwatu", name: "Uluwatu" },
+      { slug: "seminyak", name: "Seminyak" }, // No live listing there yet — needs real photography.
+      { slug: "ubud", name: "Ubud", image: "/images/destinations/bali-ubud.webp" },
+      { slug: "canggu", name: "Canggu", image: "/images/destinations/bali-canggu.webp" },
+      { slug: "uluwatu", name: "Uluwatu", image: "/images/destinations/bali-uluwatu.webp" },
     ],
   },
   { slug: "portugal", name: "Portugal", live: false },
